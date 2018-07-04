@@ -15,33 +15,33 @@ const fixtures = [
     name: 'react-app',
     mdDesc: '## React app\n\nThe app\'s `package.json` [here](./fixtures/react-app/package.json)'
   },
-  {
-    name: 'ember-quickstart',
-    mdDesc: '## Ember app\n\nThe app\'s `package.json` [here](./fixtures/ember-quickstart/package.json)'
-  },
-  {
-    name: 'angular-quickstart',
-    mdDesc: '## Angular app\n\nThe app\'s `package.json` [here](./fixtures/angular-quickstart/package.json)'
-  },
-  {
-    name: 'medium-size-app',
-    mdDesc: '## Medium Size App\n\nThe app\'s `package.json` [here](./fixtures/medium-size-app/package.json)'
-  },
-  {
-    name: 'alotta-files',
-    mdDesc: '## Lots of Files\n\nThe app\'s `package.json` [here](./fixtures/alotta-files/package.json)'
-  }
+  // {
+  //   name: 'ember-quickstart',
+  //   mdDesc: '## Ember app\n\nThe app\'s `package.json` [here](./fixtures/ember-quickstart/package.json)'
+  // },
+  // {
+  //   name: 'angular-quickstart',
+  //   mdDesc: '## Angular app\n\nThe app\'s `package.json` [here](./fixtures/angular-quickstart/package.json)'
+  // },
+  // {
+  //   name: 'medium-size-app',
+  //   mdDesc: '## Medium Size App\n\nThe app\'s `package.json` [here](./fixtures/medium-size-app/package.json)'
+  // },
+  // {
+  //   name: 'alotta-files',
+  //   mdDesc: '## Lots of Files\n\nThe app\'s `package.json` [here](./fixtures/alotta-files/package.json)'
+  // }
 ]
 
 const tests = [
   'firstInstall',
   'repeatInstall',
   'withWarmCacheAndLockfile',
-  'withWarmCache',
+  // 'withWarmCache',
   'withLockfile',
-  'withWarmCacheAndModules',
+  // 'withWarmCacheAndModules',
   'withWarmModulesAndLockfile',
-  'withWarmModules'
+  // 'withWarmModules'
 ]
 
 const testDescriptions = [
@@ -57,23 +57,23 @@ const testDescriptions = [
     'with cache',
     'with lockfile'
   ],
-  [ // withWarmCache
-    'with cache'
-  ],
+  // [ // withWarmCache
+  //   'with cache'
+  // ],
   [ // withLockfile
     'with lockfile'
   ],
-  [ // withWarmCacheAndModules
-    'with cache',
-    'with node_modules'
-  ],
+  // [ // withWarmCacheAndModules
+  //   'with cache',
+  //   'with node_modules'
+  // ],
   [ // withWarmModulesAndLockfile
     'with node_modules',
     'with lockfile'
   ],
-  [ // withWarmModules
-    'with node_modules'
-  ]
+  // [ // withWarmModules
+  //   'with node_modules'
+  // ]
 ]
 
 const toArray = (pms, resultsObj) => {
@@ -97,14 +97,16 @@ run()
   .catch(err => console.error(err))
 
 async function run () {
-  const pms = [ 'npm', 'yarn', 'pnpm' ]
+  const pms = [ 'npmci', 'npm', 'yarn', 'pnpm' ]
   const sections = []
   const svgs = []
   for (const fixture of fixtures) {
+    const npmciRest = average(await benchmark('npmci', fixture.name, {limitRuns: LIMIT_RUNS}))
     const npmRes = average(await benchmark('npm', fixture.name, {limitRuns: LIMIT_RUNS}))
     const yarnRes = average(await benchmark('yarn', fixture.name, {limitRuns: LIMIT_RUNS}))
     const pnpmRes = average(await benchmark('pnpm', fixture.name, {limitRuns: LIMIT_RUNS}))
     const resArray = toArray(pms, {
+      'npmci': npmciRest,
       'npm': npmRes,
       'yarn': yarnRes,
       'pnpm': pnpmRes
@@ -113,16 +115,13 @@ async function run () {
     sections.push(stripIndents`
       ${fixture.mdDesc}
 
-      | action  | cache | lockfile | node_modules| npm | Yarn | pnpm |
-      | ---     | ---   | ---      | ---         | --- | --- | --- |
-      | install |       |          |             | ${prettyMs(npmRes.firstInstall)} | ${prettyMs(yarnRes.firstInstall)} | ${prettyMs(pnpmRes.firstInstall)} |
-      | install | ✔    | ✔        | ✔           | ${prettyMs(npmRes.repeatInstall)} | ${prettyMs(yarnRes.repeatInstall)} | ${prettyMs(pnpmRes.repeatInstall)} |
-      | install | ✔    | ✔        |             | ${prettyMs(npmRes.withWarmCacheAndLockfile)} | ${prettyMs(yarnRes.withWarmCacheAndLockfile)} | ${prettyMs(pnpmRes.withWarmCacheAndLockfile)} |
-      | install | ✔    |          |             | ${prettyMs(npmRes.withWarmCache)} | ${prettyMs(yarnRes.withWarmCache)} | ${prettyMs(pnpmRes.withWarmCache)} |
-      | install |      | ✔        |             | ${prettyMs(npmRes.withLockfile)} | ${prettyMs(yarnRes.withLockfile)} | ${prettyMs(pnpmRes.withLockfile)} |
-      | install | ✔    |          | ✔           | ${prettyMs(npmRes.withWarmCacheAndModules)} | ${prettyMs(yarnRes.withWarmCacheAndModules)} | ${prettyMs(pnpmRes.withWarmCacheAndModules)} |
-      | install |      | ✔        | ✔           | ${prettyMs(npmRes.withWarmModulesAndLockfile)} | ${prettyMs(yarnRes.withWarmModulesAndLockfile)} | ${prettyMs(pnpmRes.withWarmModulesAndLockfile)} |
-      | install |      |          | ✔           | ${prettyMs(npmRes.withWarmModules)} | ${prettyMs(yarnRes.withWarmModules)} | ${prettyMs(pnpmRes.withWarmModules)} |
+      | action  | cache | lockfile | node_modules| npm ci | npm | Yarn | pnpm |
+      | ---     | ---   | ---      | ---         | --- | --- | --- | --- |
+      | install |       | ✔        |             | ${prettyMs(npmciRest.firstInstall)} | ${prettyMs(npmRes.firstInstall)} | ${prettyMs(yarnRes.firstInstall)} | ${prettyMs(pnpmRes.firstInstall)} |
+      | install | ✔    | ✔        | ✔           | ${prettyMs(npmciRest.repeatInstall)} | ${prettyMs(npmRes.repeatInstall)} | ${prettyMs(yarnRes.repeatInstall)} | ${prettyMs(pnpmRes.repeatInstall)} |
+      | install | ✔    | ✔        |             | ${prettyMs(npmciRest.withWarmCacheAndLockfile)} | ${prettyMs(npmRes.withWarmCacheAndLockfile)} | ${prettyMs(yarnRes.withWarmCacheAndLockfile)} | ${prettyMs(pnpmRes.withWarmCacheAndLockfile)} |
+      | install |      | ✔        |             | ${prettyMs(npmciRest.withLockfile)} | ${prettyMs(npmRes.withLockfile)} | ${prettyMs(yarnRes.withLockfile)} | ${prettyMs(pnpmRes.withLockfile)} |
+      | install |      | ✔        | ✔           | ${prettyMs(npmciRest.withWarmModulesAndLockfile)} | ${prettyMs(npmRes.withWarmModulesAndLockfile)} | ${prettyMs(yarnRes.withWarmModulesAndLockfile)} | ${prettyMs(pnpmRes.withWarmModulesAndLockfile)} |
 
       ![Graph of the ${fixture.name} results](./results/imgs/${fixture.name}.svg)
     `)
